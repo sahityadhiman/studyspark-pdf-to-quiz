@@ -1,0 +1,2 @@
+# Production WSGI server used by the Docker deployment.
+gunicorn>=23.0
