@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: studyspark-pdf-to-quiz
+    runtime: docker
+    plan: free
+    autoDeploy: true
+    healthCheckPath: /health
+    envVars:
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: FLASK_SECRET_KEY
+        generateValue: true
+      - key: FLASK_COOKIE_SECURE
+        value: "1"
+      - key: GEMINI_MODEL
+        value: gemini-3.8-flash
+      - key: GEMINI_FALLBACK_MODEL
+        value: gemini-3.7-flash
