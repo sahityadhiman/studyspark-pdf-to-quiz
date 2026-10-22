@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Turn course PDFs into practice quizzes with explanations and page references.">
+    <meta name="theme-color" content="#f5f8f5">
+    <title>StudySpark · PDF to Quiz</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="topbar">
+        <a class="brand" href="{{ url_for('index') }}" aria-label="StudySpark home">
+          <span class="brand-mark" aria-hidden="true">S</span>
+          <span>StudySpark</span>
+        </a>
+        <span class="top-note">Your notes, turned into practice</span>
+      </header>
+
+      <section class="hero" aria-labelledby="page-title">
+        <p class="eyebrow">A study tool powered by GenAI</p>
+        <h1 id="page-title">Turn your notes into a <span>quiz.</span></h1>
+        <p class="hero-copy">Upload a PDF with selectable text. Gemini creates multiple-choice questions, explains the answers, and points back to the page that supports each one.</p>
+
+        <div class="upload-card">
+          <form id="quiz-form" action="{{ url_for('generate') }}" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <label class="field-label" for="pdf">Your course PDF</label>
+            <input id="pdf" name="pdf" type="file" accept="application/pdf,.pdf" aria-describedby="upload-hint" required>
+            <p class="privacy-note" id="upload-hint">PDFs up to 10 MB and 80 pages. Extracted text is sent to Google Gemini and is not saved by this app. Don’t upload confidential files. Scanned image PDFs need OCR.</p>
+
+            <div class="form-row">
+              <div class="count-field">
+                <label class="field-label" for="question_count">Number of questions</label>
+                <select id="question_count" name="question_count">
+                  {% for count in range(3, 11) %}
+                    <option value="{{ count }}" {% if count == 5 %}selected{% endif %}>{{ count }} questions</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <button class="button button-primary" id="generate-button" type="submit">
+                <span id="button-label">Create my quiz</span>
+                <span class="button-arrow" aria-hidden="true">→</span>
+              </button>
+            </div>
+            <p class="loading-status" id="loading-status" role="status" aria-live="polite" hidden>
+              <span class="spinner" aria-hidden="true"></span>
+              Reading your PDF and asking Gemini to build the quiz. This can take a little while.
+            </p>
+          </form>
+
+          {% if error %}<div class="alert" role="alert">{{ error }}</div>{% endif %}
+        </div>
+      </section>
+
+      <section class="how-it-works" aria-labelledby="steps-title">
+        <div class="section-heading">
+          <p class="eyebrow">Simple study workflow</p>
+          <h2 id="steps-title">From course material to a useful review</h2>
+        </div>
+        <div class="steps">
+          <article class="step-card">
+            <span class="step-number">01 · READ</span>
+            <h3>Extract the notes</h3>
+            <p>Read selectable text and keep its PDF page number.</p>
+          </article>
+          <article class="step-card">
+            <span class="step-number">02 · GENERATE</span>
+            <h3>Build the quiz</h3>
+            <p>Ask Gemini for structured questions and explanations.</p>
+          </article>
+          <article class="step-card">
+            <span class="step-number">03 · STUDY</span>
+            <h3>Review and export</h3>
+            <p>Reveal answers or save the answer key as a CSV file.</p>
+          </article>
+        </div>
+      </section>
+
+      <footer class="footer">StudySpark is a student project. Generated questions can be wrong, so check the cited page before relying on an answer.</footer>
+    </main>
+  </body>
+</html>
