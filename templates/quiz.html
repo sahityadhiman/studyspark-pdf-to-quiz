@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Review your StudySpark quiz with explanations and PDF page references.">
+    <meta name="theme-color" content="#f5f8f5">
+    <title>{{ quiz.title }} · StudySpark</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body>
+    <main class="page-shell results-shell">
+      <header class="topbar">
+        <a class="brand" href="{{ url_for('index') }}" aria-label="StudySpark home">
+          <span class="brand-mark" aria-hidden="true">S</span>
+          <span>StudySpark</span>
+        </a>
+        <a class="text-link" href="{{ url_for('index') }}">← Create another quiz</a>
+      </header>
+
+      <section class="results-intro" aria-labelledby="quiz-title">
+        <p class="eyebrow">Your generated study quiz · {{ quiz.questions|length }} questions</p>
+        <h1 id="quiz-title">{{ quiz.title }}</h1>
+        <p class="hero-copy">Try answering each question before opening its explanation. Page references help you check the source material.</p>
+      </section>
+
+      <section class="question-list" aria-label="Quiz questions">
+        {% for question in quiz.questions %}
+          <article class="question-card">
+            <div class="question-topline">
+              <span class="question-number">QUESTION {{ loop.index }}</span>
+              <span class="source-tag">PDF page {{ question.source_page }}</span>
+            </div>
+            <h2>{{ question.question }}</h2>
+            <ol class="option-list" type="A">
+              {% for option in question.options %}<li>{{ option }}</li>{% endfor %}
+            </ol>
+            <details class="answer-reveal">
+              <summary>Reveal answer and explanation</summary>
+              <div class="answer-body">
+                <p><strong>Answer:</strong> {{ question.options[question.correct_option_index] }}</p>
+                <p>{{ question.explanation }}</p>
+                <p>Check PDF page {{ question.source_page }} to verify the answer.</p>
+              </div>
+            </details>
+          </article>
+        {% endfor %}
+      </section>
+
+      <div class="actions">
+        <form action="{{ url_for('download_csv') }}" method="post">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <textarea name="quiz_json" hidden>{{ quiz.model_dump_json() }}</textarea>
+          <button class="button button-primary" type="submit">Download answer key as CSV <span aria-hidden="true">↓</span></button>
+        </form>
+        <a class="button button-secondary" href="{{ url_for('index') }}">Create another quiz</a>
+      </div>
+
+      <footer class="footer">Check generated answers against your course material before relying on them.</footer>
+    </main>
+  </body>
+</html>
